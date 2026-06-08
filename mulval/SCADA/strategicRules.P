@@ -1,0 +1,223 @@
+primitive(isAsset(_asset,_importance)).
+primitive(stakeHolder(_stakeholder,_exposure)).
+primitive(hasAccess(_stakeholder,_machine)).
+primitive(vpnProtected(_src,_dst)).
+primitive(tlsProtected(_src,_dst)).
+primitive(usesTee(_host,_tee)).
+primitive(unprotectedLink(_src,_dst)).
+primitive(teeCertified(_host,_scheme,_level)).
+primitive(nonPlcHost(_host)).
+primitive(networkServiceInfo(_host,_program,_port,_proto,_user)).
+primitive(remoteVuln(_host,_service)).
+primitive(weakPassword(_host)).
+
+derived(protectedLink(_src,_dst)).
+derived(stratAccess(_host)).
+derived(stratAsset(_asset,_property)).
+derived(targetAsset(_asset,_property)).
+derived(teeStrong(_host)).
+derived(teeWeak(_host)).
+derived(keyExtracted(_host)).
+derived(remoteExploit(_host)).
+derived(credentialReuse(_host)).
+
+:- table stratAccess/1.
+:- table stratAsset/2.
+:- table targetAsset/2.
+:- table keyExtracted/1.
+:- table teeWeak/1.
+:- table teeStrong/1.
+:- table remoteExploit/1.
+:- table credentialReuse/1.
+
+protectedLink(S,D) :- vpnProtected(S,D).
+protectedLink(S,D) :- tlsProtected(S,D).
+
+/* -------- Plain rules for goal enumeration -------- */
+
+stratAccess(H) :-
+  attackerLocated(internet),
+  unprotectedLink(internet,H).
+
+stratAccess(network) :-
+  attackerLocated(internet).
+
+stratAccess(H) :-
+  stakeHolder(S,_Exposure),
+  hasAccess(S,H).
+
+stratAccess(H) :-
+  stratAccess(H2),
+  unprotectedLink(H2,H).
+
+stratAsset(plc,confidentiality) :-
+  isAsset(plc,_Importance),
+  stratAccess(plc).
+
+teeStrong(H) :- teeCertified(H, common_criteria, eal4_plus).
+teeStrong(H) :- teeCertified(H, common_criteria, eal5).
+teeStrong(H) :- teeCertified(H, common_criteria, eal6).
+teeStrong(H) :- teeCertified(H, common_criteria, eal7).
+
+teeWeak(H) :- teeCertified(H, none, none).
+
+keyExtracted(H) :-
+  stratAccess(H),
+  teeWeak(H).
+
+stratAsset(workstation,confidentiality) :-
+  isAsset(workstation,_Importance),
+  keyExtracted(workstation).
+
+stratAsset(scada,confidentiality) :-
+  isAsset(scada,_Importance),
+  keyExtracted(scada).
+
+stratAsset(database,confidentiality) :-
+  isAsset(database,_Importance),
+  keyExtracted(database).
+
+stratAsset(HostAsset,integrity) :-
+  isAsset(HostAsset,_Importance),
+  stratAccess(HostAsset),
+  nonPlcHost(HostAsset).
+
+stratAsset(HostAsset,availability) :-
+  isAsset(HostAsset,_Importance),
+  stratAccess(HostAsset).
+
+stratAsset(plc,integrity) :-
+  isAsset(plc,_Importance),
+  stratAccess(plc),
+  unprotectedLink(scada,plc).
+
+targetAsset(A,P) :-
+  stratAsset(A,P).
+
+/* -------- interaction_rules for attack graph -------- */
+
+interaction_rule(
+  (stratAccess(H) :-
+    attackerLocated(internet),
+    unprotectedLink(internet,H)
+  ),
+  rule_desc('Access through internet entry point', likely)).
+
+interaction_rule(
+  (stratAccess(network) :-
+    attackerLocated(internet)
+  ),
+  rule_desc('Attacker can reach external network segment', likely)).
+
+interaction_rule(
+  (stratAccess(H) :-
+    stakeHolder(S,Exposure),
+    hasAccess(S,H)
+  ),
+  rule_desc('Enters the system via critical stakeholder', Exposure)).
+
+interaction_rule(
+  (stratAccess(H) :-
+    stratAccess(H2),
+    unprotectedLink(H2,H)
+  ),
+  rule_desc('Movement between connected hosts', likely)).
+
+interaction_rule(
+  (stratAsset(plc,confidentiality) :-
+    isAsset(plc,Importance),
+    stratAccess(plc)
+  ),
+  rule_desc('PLC confidentiality compromise via access', Importance)).
+
+interaction_rule(
+  (keyExtracted(H) :-
+    stratAccess(H),
+    teeWeak(H)
+  ),
+  rule_desc('Key extraction possible on TEE-weak host', likely)).
+
+interaction_rule(
+  (stratAsset(workstation,confidentiality) :-
+    isAsset(workstation,Importance),
+    keyExtracted(workstation)
+  ),
+  rule_desc('Workstation confidentiality compromise via key extraction', Importance)).
+
+interaction_rule(
+  (stratAsset(scada,confidentiality) :-
+    isAsset(scada,Importance),
+    keyExtracted(scada)
+  ),
+  rule_desc('SCADA confidentiality compromise via key extraction', Importance)).
+
+interaction_rule(
+  (stratAsset(database,confidentiality) :-
+    isAsset(database,Importance),
+    keyExtracted(database)
+  ),
+  rule_desc('Database confidentiality compromise via key extraction', Importance)).
+
+interaction_rule(
+  (stratAsset(HostAsset,integrity) :-
+    isAsset(HostAsset,Importance),
+    stratAccess(HostAsset),
+    nonPlcHost(HostAsset)
+  ),
+  rule_desc('Access to a host asset', Importance)).
+
+interaction_rule(
+  (stratAsset(HostAsset,availability) :-
+    isAsset(HostAsset,Importance),
+    stratAccess(HostAsset)
+  ),
+  rule_desc('Access to a host asset', Importance)).
+
+interaction_rule(
+  (stratAsset(plc,integrity) :-
+    isAsset(plc,Importance),
+    stratAccess(plc),
+    unprotectedLink(scada,plc)
+  ),
+  rule_desc('PLC integrity compromise via unprotected control channel', Importance)).
+
+interaction_rule(
+  (targetAsset(A,P) :-
+    stratAsset(A,P)
+  ),
+  rule_desc('Attack goal alias targetAsset2', likely)).
+
+interaction_rule(
+  (teeWeak(H) :-
+    teeCertified(H, none, none)
+  ),
+  rule_desc('Host lacks TEE certification', likely)).
+
+interaction_rule(
+  (remoteExploit(H) :-
+    stratAccess(H2),
+    unprotectedLink(H2,H),
+    networkServiceInfo(H,S,_Port,_Proto,_User),
+    remoteVuln(H,S)
+  ),
+  rule_desc('Remote exploit via vulnerable network service', likely)).
+
+interaction_rule(
+  (stratAccess(H) :-
+    remoteExploit(H)
+  ),
+  rule_desc('Access gained via remote exploit', likely)).
+
+interaction_rule(
+  (stratAccess(H) :-
+    credentialReuse(H)
+  ),
+  rule_desc('Access gained via credential reuse', possible)).
+
+interaction_rule(
+  (credentialReuse(H) :-
+    stratAccess(H2),
+    unprotectedLink(H2,H),
+    weakPassword(H)
+  ),
+  rule_desc('Credential reuse on weak password host', possible)).

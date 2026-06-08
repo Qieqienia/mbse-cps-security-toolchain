@@ -1,0 +1,242 @@
+/******************************************************/
+/* Enhanced Strategic Rules for CPS Security Assessment */
+/* Based on Model-Based Systems Engineering Approach */
+/******************************************************/
+
+/**********Primitive Predicates*******************/
+primitive(isAsset(_asset,_importance)). /*_asset is either a host, a program, or a physical device*/
+primitive(stakeHolder(_stakeholder,_exposure)).
+primitive(hasAccess(_stakeholder,_machine)).
+
+primitive(targetAsset(_asset,_property)).
+
+/******************************************************/
+/*             Tabling Predicates                     */
+/*   All derived predicates should be tabled          */
+/******************************************************/
+
+:- table targetAsset/2.
+:- table canAccessHost/1.
+
+/**********Entry points*******************/
+/* Direct internet access */
+interaction_rule(
+  (canAccessHost(H) :-
+  attackerLocated(internet),
+  hacl(internet,H,_,_)
+  ),
+  rule_desc('Access through internet entry point', likely)).
+
+/* Access via compromised stakeholder */
+interaction_rule(
+  (canAccessHost(H) :-
+  stakeHolder(S,Exposure),
+  hasAccess(S,H),
+  attackerLocated(internet)
+  ),
+  rule_desc('Enters the system via compromised stakeholder', Exposure)).
+
+/* Access via stakeholder with high exposure */
+interaction_rule(
+  (canAccessHost(H) :-
+  stakeHolder(S,'likely'),
+  hasAccess(S,H)
+  ),
+  rule_desc('Access via high-exposure stakeholder', likely)).
+
+interaction_rule(
+  (canAccessHost(H) :-
+  stakeHolder(S,'possible'),
+  hasAccess(S,H)
+  ),
+  rule_desc('Access via medium-exposure stakeholder', possible)).
+
+/**********Movement between hosts*******************/
+/* Direct connection movement */
+interaction_rule(
+  (canAccessHost(H) :-
+  canAccessHost(H2),
+  hacl(H2,H,_,_)
+  ),
+  rule_desc('Movement between connected hosts', likely)).
+
+/* Multi-hop movement */
+interaction_rule(
+  (canAccessHost(H) :-
+  canAccessHost(H1),
+  hacl(H1,H2,_,_),
+  hacl(H2,H,_,_)
+  ),
+  rule_desc('Multi-hop movement through network', possible)).
+
+/* Movement via compromised intermediate host */
+interaction_rule(
+  (canAccessHost(H) :-
+  canAccessHost(H1),
+  hacl(H1,H2,_,_),
+  hacl(H2,H,_,_),
+  networkServiceInfo(H2,_,_,_,_)
+  ),
+  rule_desc('Movement via intermediate compromised host', likely)).
+
+/**********Target assets - Host level*******************/
+/* Direct host asset compromise */
+interaction_rule(
+  (targetAsset(HostAsset,availability) :-
+  isAsset(HostAsset,Importance),
+  canAccessHost(HostAsset)
+  ),
+  rule_desc('Compromise host asset availability', Importance)).
+
+interaction_rule(
+  (targetAsset(HostAsset,confidentiality) :-
+  isAsset(HostAsset,Importance),
+  canAccessHost(HostAsset)
+  ),
+  rule_desc('Compromise host asset confidentiality', Importance)).
+
+interaction_rule(
+  (targetAsset(HostAsset,integrity) :-
+  isAsset(HostAsset,Importance),
+  canAccessHost(HostAsset)
+  ),
+  rule_desc('Compromise host asset integrity', Importance)).
+
+/**********Target assets - Program/Service level*******************/
+/* Program asset on accessible host */
+interaction_rule(
+  (targetAsset(ProgAsset,availability) :-
+  isAsset(ProgAsset,Importance),
+  canAccessHost(H),
+  networkServiceInfo(H,ProgAsset,_,_,_)
+  ),
+  rule_desc('Compromise program asset availability', Importance)).
+
+interaction_rule(
+  (targetAsset(ProgAsset,confidentiality) :-
+  isAsset(ProgAsset,Importance),
+  canAccessHost(H),
+  networkServiceInfo(H,ProgAsset,_,_,_)
+  ),
+  rule_desc('Compromise program asset confidentiality', Importance)).
+
+interaction_rule(
+  (targetAsset(ProgAsset,integrity) :-
+  isAsset(ProgAsset,Importance),
+  canAccessHost(H),
+  networkServiceInfo(H,ProgAsset,_,_,_)
+  ),
+  rule_desc('Compromise program asset integrity', Importance)).
+
+/**********Aggregate target asset rule*******************/
+/* Generic target asset (for attackGoal(targetAsset(_,_)) support) */
+interaction_rule(
+  (targetAsset(Asset,Property) :-
+  targetAsset(Asset,Property)
+  ),
+  rule_desc('Aggregate target asset', certain)).
+
+/* Support for wildcard attack goals */
+interaction_rule(
+  (targetAsset(_,_) :-
+  targetAsset(Asset,Property)
+  ),
+  rule_desc('Wildcard target asset match', certain)).
+
+/**********Stakeholder-based attack paths*******************/
+/* Technician access path */
+interaction_rule(
+  (canAccessHost(H) :-
+  stakeHolder(technician,Exposure),
+  hasAccess(technician,H),
+  canAccessHost(plc)
+  ),
+  rule_desc('Access via technician compromised PLC', Exposure)).
+
+/* Employee access path */
+interaction_rule(
+  (canAccessHost(H) :-
+  stakeHolder(employee,Exposure),
+  hasAccess(employee,H),
+  canAccessHost(workstation)
+  ),
+  rule_desc('Access via employee compromised workstation', Exposure)).
+
+/* Alarm provider access path */
+interaction_rule(
+  (canAccessHost(H) :-
+  stakeHolder(alarmprovider,Exposure),
+  hasAccess(alarmprovider,H),
+  canAccessHost(webserver)
+  ),
+  rule_desc('Access via alarm provider compromised webserver', Exposure)).
+
+interaction_rule(
+  (canAccessHost(H) :-
+  stakeHolder(alarm_provider,Exposure),
+  hasAccess(alarm_provider,H),
+  canAccessHost(webserver)
+  ),
+  rule_desc('Access via alarm provider compromised webserver', Exposure)).
+
+/**********SCADA-specific attack paths*******************/
+/* SCADA to PLC path */
+interaction_rule(
+  (canAccessHost(plc) :-
+  canAccessHost(scada),
+  hacl(scada,plc,opcua,opcua_port)
+  ),
+  rule_desc('SCADA to PLC via OPC UA', likely)).
+
+/* Web server to SCADA path */
+interaction_rule(
+  (canAccessHost(scada) :-
+  canAccessHost(webserver),
+  hacl(webserver,scada,opcua,opcua_port)
+  ),
+  rule_desc('Web server to SCADA via OPC UA', likely)).
+
+/* Web server to database path */
+interaction_rule(
+  (canAccessHost(database) :-
+  canAccessHost(webserver),
+  hacl(webserver,database,tcp,3306)
+  ),
+  rule_desc('Web server to database via TCP', likely)).
+
+/* PLC to actuator path */
+interaction_rule(
+  (canAccessHost(actuator) :-
+  canAccessHost(plc),
+  hacl(plc,actuator,opcua,opcua_port)
+  ),
+  rule_desc('PLC to actuator via OPC UA', likely)).
+
+/**********Asset importance-based rules*******************/
+/* Certain importance assets */
+interaction_rule(
+  (targetAsset(Asset,Property) :-
+  isAsset(Asset,'certain'),
+  canAccessHost(Asset),
+  targetAsset(Asset,Property)
+  ),
+  rule_desc('Target certain importance asset', certain)).
+
+/* Likely importance assets */
+interaction_rule(
+  (targetAsset(Asset,Property) :-
+  isAsset(Asset,'likely'),
+  canAccessHost(Asset),
+  targetAsset(Asset,Property)
+  ),
+  rule_desc('Target likely importance asset', likely)).
+
+/* Possible importance assets */
+interaction_rule(
+  (targetAsset(Asset,Property) :-
+  isAsset(Asset,'possible'),
+  canAccessHost(Asset),
+  targetAsset(Asset,Property)
+  ),
+  rule_desc('Target possible importance asset', possible)).
+

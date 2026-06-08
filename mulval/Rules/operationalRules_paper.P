@@ -1,0 +1,292 @@
+primitive(isSensor(_host)).
+primitive(isActuator(_host)).
+primitive(physicalAccess(_principal,_host)).
+primitive(malicious(_principal)).
+primitive(inCompetent(_principal)).
+primitive(competent(_principal)).
+
+primitive(isA(_concreteType, _abstractType)).
+primitive(refines(_concreteType,_abstractType)).
+primitive(abstractVul(_cveID,_program)).
+primitive(inSubnet(_host, _subnet)).
+
+primitive(initiallyTriggered(_vulID)).
+derived(isTriggered(_vulID)).
+
+derived(accessInfo(_host)).
+derived(dos(_host)).
+derived(isCompromised(_device)).
+derived(mitm(_h1,_h2)).
+derived(covertAppropriation(_h)).
+derived(logInService(_host,_protocol,_port)).
+
+derived(targetAsset(_asset,_property)).
+derived(targetAsset(_asset)).
+
+:- table isTriggered/1.
+:- table accessInfo/1.
+:- table isCompromised/1.
+:- table mitm/2.
+:- table covertAppropriation/1.
+:- table dos/1.
+:- table logInService/3.
+
+/****** 关键：直接网络访问 (RULE 6) ******/
+interaction_rule(
+  (netAccess(H,Protocol,Port) :-
+  attackerLocated(Zone),
+  hacl(Zone,H,Protocol,Port)
+  ),
+  rule_desc('direct network access', certain)).
+
+/****** Multi-hop access (RULE 4) ******/
+interaction_rule(
+  (netAccess(H2,Protocol,Port) :-
+  execCode(H1,_),
+  hacl(H1,H2,Protocol,Port)
+  ),
+  rule_desc('multi-hop access', certain)).
+
+/****** VPN is a login service (RULE 14) ******/
+interaction_rule(
+  (logInService(H,Protocol,Port) :-
+  networkServiceInfo(H,vpn_service,Protocol,Port,_)
+  ),
+  rule_desc('VPN is a login service', certain)).
+
+/****** SSH is a login service ******/
+interaction_rule(
+  (logInService(H,Protocol,Port) :-
+  networkServiceInfo(H,ssh,Protocol,Port,_)
+  ),
+  rule_desc('SSH is a login service', certain)).
+
+/****** Access a host through executing code (RULE 7) ******/
+interaction_rule(
+  (canAccessHost(H) :-
+  execCode(H,_)
+  ),
+  rule_desc('Access a host through executing code on the machine', certain)).
+
+/****** Password sniffing (RULE 10) ******/
+interaction_rule(
+  (principalCompromised(Victim) :-
+  execCode(H,root),
+  hasAccount(Victim,H,_)
+  ),
+  rule_desc('password sniffing', likely)).
+
+/****** Incompetent user (RULE 11) ******/
+interaction_rule(
+  (principalCompromised(Victim) :-
+  inCompetent(Victim)
+  ),
+  rule_desc('incompetent user', unlikely)).
+
+/****** Principal Compromised (RULE 39) ******/
+interaction_rule(
+  (principalCompromised(Victim) :-
+  inCompetent(Victim),
+  malicious(Victim)
+  ),
+  rule_desc('Incompetent user is malicious', likely)).
+
+/****** Access through compromised principal (RULE 40) ******/
+interaction_rule(
+  (canAccessHost(Host) :-
+  principalCompromised(Principal),
+  hasAccount(Principal,Host,_)
+  ),
+  rule_desc('Access a host through compromised principal', likely)).
+
+/****** Access service through compromised principal (RULE 41) ******/
+interaction_rule(
+  (netAccess(Host,Protocol,Port) :-
+  principalCompromised(Principal),
+  hasAccount(Principal,Host,_),
+  networkServiceInfo(Host,_,Protocol,Port,_)
+  ),
+  rule_desc('Access a service through compromised principal', likely)).
+
+/****** execCode through compromised principal (RULE 42) ******/
+interaction_rule(
+  (execCode(Host,Perm) :-
+  principalCompromised(Victim),
+  hasAccount(Victim,Host,Perm),
+  canAccessHost(Host)
+  ),
+  rule_desc('When a principal is compromised any machine he has an account on will also be compromised', likely)).
+
+/************Vulnerability triggering (RULE 25)*******************/
+interaction_rule(
+  (isTriggered(VulID) :-
+  vulExists(_,VulID,_,none,_)
+  ),
+  rule_desc('Vulnerability triggered from the start', certain)).
+
+interaction_rule(
+  (isTriggered(VulID) :-
+  vulExists(H1,VulID,SW,hijackcomm,_),
+  networkServiceInfo(H1,SW,_,_,_),
+  execCode(H2,_),
+  hacl(H2,H1,_,_)
+  ),
+  rule_desc('Hijack communication', certain)).
+
+/*****Denial of Service (RULE 26)*********/
+interaction_rule(
+  (dos(H) :-
+  vulExists(H, VulID, Software, _, dos),
+  cvss(VulID,AC),
+  isTriggered(VulID),
+  networkServiceInfo(H,Software,Protocol,Port,_),
+  netAccess(H,Protocol,Port)
+  ),
+  rule_desc('DoS vulnerability exploit', cvss_ac(AC))).
+
+interaction_rule(
+  (dos(H) :-
+  netAccess(H,_,_)
+  ),
+  rule_desc('Local Network Attack', unlikely)).
+
+/*****Information Disclosure (RULE 28)*********/
+interaction_rule(
+  (accessInfo(H) :-
+  vulExists(H,VulID,Software,_,leakinfo),
+  cvss(VulID,AC),
+  isTriggered(VulID),
+  networkServiceInfo(H,Software,Protocol,Port,_),
+  netAccess(H,Protocol,Port)
+  ),
+  rule_desc('Extracts info by exploiting vulnerability', cvss_ac(AC))).
+
+/********************Physically compromising************************************/
+interaction_rule(
+  (isCompromised(Device) :-
+  physicalAccess(Principal,Device),
+  malicious(Principal)
+  ),
+  rule_desc('Physically compromising a device', likely)).
+
+/********************Man In The Middle************************************/
+interaction_rule(
+  (mitm(Device,Host) :-
+  isCompromised(Device),
+  hacl(Device,Host,_,_)
+  ),
+  rule_desc('CAPEC 94 Man In The Middle', likely)).
+
+interaction_rule(
+  (mitm(Host,Device) :-
+  isCompromised(Device),
+  hacl(Host,Device,_,_)
+  ),
+  rule_desc('CAPEC 94 Man In The Middle', likely)).
+
+interaction_rule(
+  (mitm(H1,H2) :-
+  execCode(H1,_),
+  hacl(H1,H2,_,_)
+  ),
+  rule_desc('CAPEC 94 Man In The Middle', likely)).
+
+interaction_rule(
+  (mitm(H1,H2) :-
+  execCode(H2,_),
+  hacl(H1,H2,_,_)
+  ),
+  rule_desc('CAPEC 94 Man In The Middle', likely)).
+
+/***********************Compromise of assets (RULE 43, 50, etc)*************************/
+interaction_rule(
+  (targetAsset(HostAsset,availability) :-
+  dos(HostAsset)
+  ),
+  rule_desc('Compromising the availability of an asset', certain)).
+
+interaction_rule(
+  (targetAsset(ProgAsset,availability) :-
+  dos(Host),
+  networkServiceInfo(Host,ProgAsset,_,_,_)
+  ),
+  rule_desc('Compromising the availability of an asset', certain)).
+
+interaction_rule(
+  (targetAsset(HostAsset,integrity) :-
+  execCode(HostAsset,_)
+  ),
+  rule_desc('Compromising the integrity of an asset', certain)).
+
+interaction_rule(
+  (targetAsset(ProgAsset,integrity) :-
+  execCode(Host,Perm),
+  networkServiceInfo(Host,ProgAsset,_,_,Perm)
+  ),
+  rule_desc('Compromising the integrity of an asset', certain)).
+
+interaction_rule(
+  (targetAsset(HostAsset,confidentiality) :-
+  accessInfo(HostAsset)
+  ),
+  rule_desc('Compromising the confidentiality of an asset', certain)).
+
+interaction_rule(
+  (targetAsset(HostAsset,confidentiality) :-
+  execCode(HostAsset,_)
+  ),
+  rule_desc('Compromising the confidentiality of an asset', certain)).
+
+interaction_rule(
+  (targetAsset(ProgAsset,confidentiality) :-
+  accessInfo(Host),
+  networkServiceInfo(Host,ProgAsset,_,_,_)
+  ),
+  rule_desc('Compromising the confidentiality of an asset', certain)).
+
+interaction_rule(
+  (targetAsset(ProgAsset,confidentiality) :-
+  execCode(Host,Perm),
+  networkServiceInfo(Host,ProgAsset,_,_,Perm)
+  ),
+  rule_desc('Compromising the confidentiality of an asset', certain)).
+
+/*******************Refinement*********************/
+interaction_rule(
+  (refines(Concrete,Abstract) :-
+  isA(Concrete,Abstract)
+  ),
+  rule_desc('Direct Refinement', certain)).
+
+interaction_rule(
+  (vulExists(Host,CVE_ID,ConcreteSW,Pre,Post) :-
+  networkServiceInfo(Host,ConcreteSW,_,_,_),
+  isA(ConcreteSW,AbstractSW),
+  abstractVul(CVE_ID,AbstractSW),
+  vulProperty(CVE_ID,Pre,Post)
+  ),
+  rule_desc('Direct Refinement', certain)).
+
+interaction_rule(
+  (targetAsset(Asset) :-
+  targetAsset(Asset,_)
+  ),
+  rule_desc('Aggregate Target Asset', certain)).
+
+% 添加论文中的所有CVE
+abstractVul('CVE-2023-22610',ecostruxure_machine_expert).
+vulProperty('CVE-2023-22610',hijackcomm,dos).
+cvss('CVE-2023-22610',l).
+
+abstractVul('CVE-2022-2988',ecostruxure_machine_expert).
+vulProperty('CVE-2022-2988',webAccess,leakinfo).
+cvss('CVE-2022-2988',l).
+
+abstractVul('CVE-2023-22611',ecostruxure_machine_expert).
+vulProperty('CVE-2023-22611',hijackcomm,leakinfo).
+cvss('CVE-2023-22611',m).
+
+abstractVul('CVE-2022-45789',ecostruxure_control_expert).
+vulProperty('CVE-2022-45789',localExploit,privEscalation).
+vulProperty('CVE-2022-45789',hijackcomm,authenticationBypass).
+cvss('CVE-2022-45789',l).

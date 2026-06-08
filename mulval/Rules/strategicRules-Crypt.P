@@ -1,0 +1,110 @@
+ 
+primitive(isAsset(_asset,_importance)).
+primitive(stakeHolder(_stakeholder,_exposure)).
+primitive(hasAccess(_stakeholder,_machine)).
+primitive(vpnProtected(_src,_dst)).
+primitive(tlsProtected(_src,_dst)).
+primitive(usesHsm(_host,_hsm)).
+primitive(unprotectedLink(_src,_dst)).
+ 
+derived(canAccessHost(_host)).
+derived(protectedLink(_src,_dst)).
+derived(targetAsset(_asset,_property)).
+ 
+:- table targetAsset/2.
+:- table canAccessHost/1.
+ 
+derived(protectedLink(_src,_dst)).
+
+interaction_rule(
+  (protectedLink(S,D) :-
+    vpnProtected(S,D)
+  ),
+  rule_desc('VPN protected link', 1.0)).
+
+interaction_rule(
+  (protectedLink(S,D) :-
+    tlsProtected(S,D)
+  ),
+  rule_desc('TLS protected link', 1.0)).
+ 
+/********** Entry points ***********/
+
+interaction_rule(
+  (canAccessHost(network) :-
+    attackerLocated(internet)
+  ),
+  rule_desc('Access into enterprise network', likely)).
+  
+interaction_rule(
+  (canAccessHost(H) :-
+    attackerLocated(internet),
+    unprotectedLink(internet,H)
+  ),
+  rule_desc('Access through internet entry point', likely)).
+ 
+interaction_rule(
+  (canAccessHost(H) :-
+    attackerLocated(internet),
+    hacl(internet,H,_,_),
+    protectedLink(internet,H)
+  ),
+  rule_desc('Access through protected internet entry point', possible)).
+ 
+interaction_rule(
+  (canAccessHost(H) :-
+    stakeHolder(S,Exposure),
+    hasAccess(S,H)
+  ),
+  rule_desc('Enters the system via critical stakeholder', Exposure)).
+ 
+/********** Movement ***********/
+interaction_rule(
+  (canAccessHost(H) :-
+    canAccessHost(H2),
+    unprotectedLink(H2,H)
+  ),
+  rule_desc('Movement between connected hosts', likely)).
+ 
+interaction_rule(
+  (canAccessHost(H) :-
+    canAccessHost(H2),
+    hacl(H2,H,_,_),
+    protectedLink(H2,H)
+  ),
+  rule_desc('Movement between protected connected hosts', possible)).
+ 
+/********** Target assets ***********/
+interaction_rule(
+  (targetAsset(HostAsset,_) :-
+    isAsset(HostAsset,Importance),
+    canAccessHost(HostAsset)
+  ),
+  rule_desc('Access to a host asset', Importance)).
+ 
+/* PLC integrity specific logic */
+interaction_rule(
+  (targetAsset(plc,integrity) :-
+    isAsset(plc,Importance),
+    canAccessHost(plc),
+    unprotectedLink(scada,plc)
+  ),
+  rule_desc('PLC integrity compromise via unprotected control channel', Importance)).
+ 
+interaction_rule(
+  (targetAsset(plc,integrity) :-
+    isAsset(plc,_Importance),
+    canAccessHost(plc),
+    tlsProtected(scada,plc),
+    unprotectedLink(scada,hsm)
+  ),
+  rule_desc('PLC integrity compromise via TLS-protected control channel', possible)).
+ 
+interaction_rule(
+  (targetAsset(plc,integrity) :-
+    isAsset(plc,_Importance),
+    canAccessHost(plc),
+    tlsProtected(scada,plc),
+    usesHsm(scada,_)
+  ),
+  rule_desc('PLC integrity compromise via TLS+HSM-protected control channel', unlikely)).

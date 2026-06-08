@@ -1,0 +1,55 @@
+primitive(isAsset(_asset,_importance)). /*_asset is either a host, a program, or a physical device*/
+
+primitive(stakeHolder(_stakeholder,_exposure)).
+primitive(hasAccess(_stakeholder,_machine)).
+
+primitive(targetAsset(_asset,_property)).
+
+/******************************************************/
+/*             Tabling Predicates                     */
+/*   All derived predicates should be tabled          */
+/******************************************************/
+
+:- table targetAsset/2.
+
+/**********Entry points*******************/
+interaction_rule(
+  (canAccessHost(H) :-
+  attackerLocated(internet),
+  hacl(internet,H,_,_)
+  ),
+  rule_desc('Access through internet entry point', likely)).
+
+interaction_rule(
+  (canAccessHost(H) :-
+  stakeHolder(S,Exposure),
+  hasAccess(S,H)
+  ),
+  rule_desc('Enters the system via critical stakeholder', Exposure)).
+
+
+/**********Movement*******************/
+interaction_rule(
+  (canAccessHost(H) :-
+  canAccessHost(H2),
+  hacl(H2,H,_,_)
+  ),
+  rule_desc('Movement between connected hosts', likely)).
+
+
+/**********Target assets*******************/
+interaction_rule(
+  (targetAsset(HostAsset,_) :-
+  isAsset(HostAsset,Importance),
+  canAccessHost(HostAsset)
+  ),
+  rule_desc('Access to a host asset', Importance)).
+
+interaction_rule(
+  (targetAsset(ProgAsset,_) :-
+  isAsset(ProgAsset,Importance),
+  canAccessHost(H),
+  networkServiceInfo(H,ProgAsset,_,_,_)
+  ),
+  rule_desc('Access to a host asset', Importance)).
+

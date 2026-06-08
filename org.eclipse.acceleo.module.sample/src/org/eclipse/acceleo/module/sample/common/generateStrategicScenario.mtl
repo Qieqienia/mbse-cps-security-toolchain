@@ -1,0 +1,188 @@
+[comment encoding = UTF-8 /]
+[module generateStrategicScenario('http://www.eclipse.org/papyrus/sysml/1.6/SysML', 'http://www.eclipse.org/uml2/5.0.0/UML', 'http://www.eclipse.org/uml2/5.0.0/UML/Profile/Standard')]
+
+[import org::eclipse::acceleo::module::services::utils/]
+
+[template private generateStakeholder(elem:OclAny) post(trim())]
+[let user:Actor = elem.eGet('base_Actor').oclAsType(Actor)]
+[let exposure:String = elem.eGet('exposure').toString()]
+stakeHolder([formatName(user.name)/],[translateImportanceLevel(exposure)/]).
+[/let]
+[/let]
+[/template]
+
+[template private generateHasAccess(elem:OclAny) post(trim())]
+[let dependency:Dependency = elem.eGet('base_Dependency').oclAsType(Dependency)]
+hasAccess([formatName(dependency.client.name)/],[formatName(dependency.supplier.name)/]).
+[/let]
+[/template]
+
+[template private generateHACL(elem: OclAny, m: Model) post(trim())]
+[let conn:InformationFlow = elem.eGet('base_InformationFlow').oclAsType(InformationFlow)]
+[if ((conn.informationSource.oclIsTypeOf(Property)=true->asBag() and conn.informationSource.oclAsType(Property).type<>null) or (conn.informationSource.oclIsTypeOf(Port)=true->asBag()))]
+[if ((conn.informationSource.oclIsTypeOf(Port)=true->asBag()) or m.siblings()->exists(node| (node.eClass().name='Host' or node.eClass().name='Device') and node.eGet('base_Class').oclAsType(Class).name->asBag()=conn.informationSource.oclAsType(Property).type.name))]
+[writeHACLWithOptions(elem, conn)/]
+
+[let srcName:String = (if (conn.informationSource.oclIsTypeOf(Port)=true->asBag()) then formatName(conn.informationSource.oclAsType(Port).eContainer(Class).name) else formatName(conn.informationSource.oclAsType(Property).type.name) endif)]
+[let dstName:String = (if (conn.informationTarget.oclIsTypeOf(Port)=true->asBag()) then formatName(conn.informationTarget.oclAsType(Port).eContainer(Class).name) else (if (conn.informationTarget.oclIsTypeOf(Property)=true->asBag()) then formatName(conn.informationTarget.oclAsType(Property).name) else '_' endif) endif)]
+[let prot:String = underscoreIfEmpty(elem,'protocol').toString().toLower()]
+
+[if (prot.contains('ipsec') and dstName<>'_')]
+vpnProtected([srcName/], [dstName/]).
+[/if]
+
+[if (prot.contains('tls') and dstName<>'_')]
+tlsProtected([srcName/], [dstName/]).
+[/if]
+
+[if ((not prot.contains('ipsec')) and (not prot.contains('tls')) and dstName<>'_')]
+unprotectedLink([srcName/], [dstName/]).
+[/if]
+
+[if (dstName='tee')]
+usesTee([srcName/], tee).
+[/if]
+
+[/let]
+[/let]
+[/let]
+[/if]
+[/if]
+[/let]
+[/template]
+
+[template private generateTeeUsage(elem: OclAny, m: Model) post(trim())]
+[comment usesTee facts are generated in generateHACL /]
+[/template]
+
+[template private generateNetworkServiceInfo(elem: OclAny, m : Model) post(trim())]
+[let host:Class = elem.eGet('base_Class').oclAsType(Class)]
+[for (program:Property | host.ownedAttribute->selectByType(Property))]
+[let isProgram : Boolean = program.type.getAppliedStereotypes().toString().contains('Program') = true->asBag()]
+[if (isProgram)]
+networkServiceInfo([formatName(host.name)/], [formatName(program.name)/], _, _, _).
+[/if]
+[/let]
+[/for]
+[/let]
+[/template]
+
+[template private translateImportanceLevel(importance:String) post(trim())]
+[if (importance='VeryHigh')]
+'certain'
+[/if]
+[if (importance='High')]
+'likely'
+[/if]
+[if (importance='Medium')]
+'possible'
+[/if]
+[if (importance='Low')]
+'unlikely'
+[/if]
+[if (importance='VeryLow')]
+0
+[/if]
+[/template]
+
+[template private generateAsset(elem:OclAny) post(trim())]
+[let asset:Class = elem.eGet('base_Class').oclAsType(Class)]
+[let importance:String = elem.eGet('importance').toString()]
+isAsset([formatName(asset.name)/],[translateImportanceLevel(importance)/]).
+[/let]
+[/let]
+[/template]
+
+[template private generateAttackGoal(elem:OclAny) post(trim())]
+[let asset:Class = elem.eGet('base_Class').oclAsType(Class)]
+[for (property:OclAny | elem.eGet('securityProperty'))]
+/*attackGoal(targetAsset([formatName(asset.name)/],[formatName(property.toString())/])).*/
+[/for]
+[/let]
+[/template]
+
+[template public generateStrategicScenario( m : Model) post(trim())]
+[file (m.name+'strategic.txt', false, 'UTF-8')]
+[comment @main/]
+
+[for (elem : OclAny | m.siblings())]
+[let class:String = elem.eClass().name]
+[if(class.contains('Attacker'))]
+[generateAttackerLocation(elem,m)/]
+[/if]
+[/let]
+[/for]
+
+/********************Attack Goals**************************/
+/*Uncomment to run one or multiple attack goals*/
+
+attackGoal(targetAsset(_,_)).
+[for (elem: OclAny | m.siblings())]
+[if (elem.eGet('isAsset')=true)]
+[generateAttackGoal(elem)/]
+[/if]
+[/for]
+
+/********************Assets**************************/
+[for (elem: OclAny | m.siblings())]
+[if (elem.eGet('isAsset')=true)]
+[generateAsset(elem)/]
+[/if]
+[/for]
+
+/********Stakeholders***************/
+[for (elem : OclAny | m.siblings())]
+[let class:String = elem.eClass().name]
+[if(class.contains('User'))]
+[generateStakeholder(elem)/]
+[/if]
+[/let]
+[/for]
+
+[for (elem : OclAny | m.siblings())]
+[let class:String = elem.eClass().name]
+[if(class.contains('physicalAccess') or class.contains('hasAccount'))]
+[generateHasAccess(elem)/]
+[/if]
+[/let]
+[/for]
+
+/******************Hosts and Connections************************/
+[for (elem: OclAny | m.siblings())]
+[let class:String = elem.eClass().name]
+[if (class.contains('Connection'))]
+[generateHACL(elem,m)/]
+[generateTeeUsage(elem,m)/]
+[/if]
+[/let]
+[/for]
+
+[for (elem: OclAny | m.siblings())]
+[let class:String = elem.eClass().name]
+[if (class.contains('Host'))]
+[let host:Class = elem.eGet('base_Class').oclAsType(Class)]
+[if (m.siblings()->exists(e | e.eClass().name='Connection' and
+   (
+     (e.eGet('base_InformationFlow').oclAsType(InformationFlow).informationSource.oclIsTypeOf(Port)=true->asBag() and formatName(e.eGet('base_InformationFlow').oclAsType(InformationFlow).informationSource.oclAsType(Port).eContainer(Class).name)=formatName(host.name)) or
+     (e.eGet('base_InformationFlow').oclAsType(InformationFlow).informationSource.oclIsTypeOf(Property)=true->asBag() and formatName(e.eGet('base_InformationFlow').oclAsType(InformationFlow).informationSource.oclAsType(Property).type.name)=formatName(host.name))
+   ) and
+   (
+     (e.eGet('base_InformationFlow').oclAsType(InformationFlow).informationTarget.oclIsTypeOf(Port)=true->asBag() and formatName(e.eGet('base_InformationFlow').oclAsType(InformationFlow).informationTarget.oclAsType(Port).eContainer(Class).name)='tee') or
+     (e.eGet('base_InformationFlow').oclAsType(InformationFlow).informationTarget.oclIsTypeOf(Property)=true->asBag() and formatName(e.eGet('base_InformationFlow').oclAsType(InformationFlow).informationTarget.oclAsType(Property).name)='tee')
+   )
+ ))]
+ teeCertified([formatName(host.name)/], common_criteria, eal5).
+ [else]
+ teeCertified([formatName(host.name)/], none, none).
+ [/if]
+ [if (formatName(host.name) <> 'plc')]
+  nonPlcHost([formatName(host.name)/]).
+ [/if]
+ [/let]
+ [generateNetworkServiceInfo(elem,m)/]
+ [/if]
+ [/let]
+ [/for]
+
+[/file]
+[/template]

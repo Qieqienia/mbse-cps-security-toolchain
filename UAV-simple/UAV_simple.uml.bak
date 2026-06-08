@@ -1,0 +1,249 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xmi:XMI xmi:version="20131001" xmlns:xmi="http://www.omg.org/spec/XMI/20131001" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:Blocks="http://www.eclipse.org/papyrus/sysml/1.6/SysML/Blocks" xmlns:PortsAndFlows="http://www.eclipse.org/papyrus/sysml/1.6/SysML/PortsAndFlows" xmlns:SysML_Extension_for_MulVAL.Stereotypes="http:///SysML_Extension_for_MulVAL/Stereotypes.ecore" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" xmlns:uml="http://www.eclipse.org/uml2/5.0.0/UML" xsi:schemaLocation="http://www.eclipse.org/papyrus/sysml/1.6/SysML/Blocks http://www.eclipse.org/papyrus/sysml/1.6/SysML#//blocks http://www.eclipse.org/papyrus/sysml/1.6/SysML/PortsAndFlows http://www.eclipse.org/papyrus/sysml/1.6/SysML#//portsandflows http:///SysML_Extension_for_MulVAL/Stereotypes.ecore file:/E:/OT/CERESHugo-main/CERESHugo-main/SysML_Extension_for_MulVAL/SysML_Extension_for_MulVAL.profile.uml#_6vnjwolIEe6lssfuL0bjRg">
+  <uml:Model xmi:id="_O15JsMetEfC1GIT_JHAH1w" name="UAV_simple">
+    <packageImport xmi:type="uml:PackageImport" xmi:id="_O3UGAsetEfC1GIT_JHAH1w">
+      <importedPackage xmi:type="uml:Model" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#_0"/>
+    </packageImport>
+    <packageImport xmi:type="uml:PackageImport" xmi:id="_O3aMoMetEfC1GIT_JHAH1w">
+      <importedPackage xmi:type="uml:Package" href="pathmap://SysML16_LIBRARIES/SysML-Standard-Library.uml#SysML.package_packagedElement_Libraries"/>
+    </packageImport>
+    <packagedElement xmi:type="uml:Class" xmi:id="_S5N1MMetEfC1GIT_JHAH1w" name="UAV_Platform">
+      <ownedAttribute xmi:type="uml:Property" xmi:id="_xHkYQMevEfCGPb_9WwiKNw" name="flightcontroller" type="_TM7bYMetEfC1GIT_JHAH1w" aggregation="shared" association="_xHeRoMevEfCGPb_9WwiKNw">
+        <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_xHk_UMevEfCGPb_9WwiKNw"/>
+        <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_xHk_UcevEfCGPb_9WwiKNw" value="1"/>
+      </ownedAttribute>
+      <ownedAttribute xmi:type="uml:Property" xmi:id="_FxZjAsewEfCGPb_9WwiKNw" name="communicationmodule" type="_TWFXYMetEfC1GIT_JHAH1w" aggregation="shared" association="_FxY78MewEfCGPb_9WwiKNw">
+        <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_FxaKEMewEfCGPb_9WwiKNw"/>
+        <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_FxaKEcewEfCGPb_9WwiKNw" value="1"/>
+      </ownedAttribute>
+      <ownedAttribute xmi:type="uml:Property" xmi:id="_QcnIcMh0EfC7uu5CIMiXWQ" name="flightController" type="_TM7bYMetEfC1GIT_JHAH1w"/>
+      <ownedAttribute xmi:type="uml:Property" xmi:id="_RRHukMh0EfC7uu5CIMiXWQ" name="communicationModule" type="_TWFXYMetEfC1GIT_JHAH1w"/>
+      <ownedAttribute xmi:type="uml:Property" xmi:id="_GPS_Prop_UAV" name="gpsReceiver" type="_GPS_Receiver_UAV"/>
+      <ownedAttribute xmi:type="uml:Property" xmi:id="_IMU_Prop_UAV" name="imuSensor" type="_IMU_Sensor_UAV"/>
+      <ownedAttribute xmi:type="uml:Property" xmi:id="_Motor_Prop_UAV" name="motorController" type="_MotorController_UAV"/>
+      <ownedAttribute xmi:type="uml:Port" xmi:id="_x2jIoMh0EfC7uu5CIMiXWQ" name="commPort" aggregation="composite"/>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Class" xmi:id="_TD9FkMetEfC1GIT_JHAH1w" name="GroundControlStation">
+      <ownedAttribute xmi:type="uml:Property" xmi:id="_49KbgsevEfCGPb_9WwiKNw" name="communicationmodule" type="_TWFXYMetEfC1GIT_JHAH1w" association="_49JNYMevEfCGPb_9WwiKNw">
+        <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_49LCkMevEfCGPb_9WwiKNw"/>
+        <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_49LCkcevEfCGPb_9WwiKNw" value="1"/>
+      </ownedAttribute>
+      <ownedAttribute xmi:type="uml:Property" xmi:id="_ywhLoMh2EfC7uu5CIMiXWQ" name="communicationModule" type="_TWFXYMetEfC1GIT_JHAH1w"/>
+      <ownedAttribute xmi:type="uml:Port" xmi:id="_5jiXkMh2EfC7uu5CIMiXWQ" name="gcsCommPort" aggregation="composite"/>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Class" xmi:id="_TM7bYMetEfC1GIT_JHAH1w" name="FlightController">
+      <ownedAttribute xmi:type="uml:Port" xmi:id="_TKPE8Mh3EfC7uu5CIMiXWQ" name="gpsDataIn" aggregation="composite"/>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Class" xmi:id="_TWFXYMetEfC1GIT_JHAH1w" name="CommunicationModule">
+      <ownedAttribute xmi:type="uml:Property" xmi:id="_4yIpUPXoEfCg7f67tgB0dA" name="attacker" type="_VDdfMMetEfC1GIT_JHAH1w" aggregation="shared" association="_4yHbMPXoEfCg7f67tgB0dA">
+        <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_4yIpUfXoEfCg7f67tgB0dA"/>
+        <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_4yIpUvXoEfCg7f67tgB0dA" value="1"/>
+      </ownedAttribute>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Class" xmi:id="_GPS_Receiver_UAV" name="GPS_Receiver">
+      <ownedAttribute xmi:type="uml:Port" xmi:id="_GPS_Port_UAV" name="gpsDataOut" aggregation="composite"/>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Class" xmi:id="_IMU_Sensor_UAV" name="IMU_Sensor">
+      <ownedAttribute xmi:type="uml:Port" xmi:id="_IMU_Port_UAV" name="sensorDataOut" aggregation="composite"/>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Class" xmi:id="_MotorController_UAV" name="MotorController">
+      <ownedAttribute xmi:type="uml:Port" xmi:id="_Motor_Port_UAV" name="controlIn" aggregation="composite"/>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Class" xmi:id="_Internet_UAV_1" name="Internet">
+      <ownedAttribute xmi:type="uml:Property" xmi:id="_Internet_Attacker_Prop" name="attacker" type="_VDdfMMetEfC1GIT_JHAH1w" aggregation="shared" association="_Internet_Attacker_Assoc">
+        <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_Internet_Attacker_Lower"/>
+        <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_Internet_Attacker_Upper" value="1"/>
+      </ownedAttribute>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Actor" xmi:id="_VDdfMMetEfC1GIT_JHAH1w" name="Attacker"/>
+    <packagedElement xmi:type="uml:Association" xmi:id="_xHeRoMevEfCGPb_9WwiKNw" memberEnd="_xHkYQMevEfCGPb_9WwiKNw _xHlmYMevEfCGPb_9WwiKNw">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_xHjKIMevEfCGPb_9WwiKNw" source="org.eclipse.papyrus">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_xHjxMMevEfCGPb_9WwiKNw" key="nature" value="UML_Nature"/>
+      </eAnnotations>
+      <ownedEnd xmi:type="uml:Property" xmi:id="_xHlmYMevEfCGPb_9WwiKNw" name="uav_platform" type="_S5N1MMetEfC1GIT_JHAH1w" association="_xHeRoMevEfCGPb_9WwiKNw"/>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Association" xmi:id="_Internet_Attacker_Assoc" memberEnd="_Internet_Attacker_Prop _Internet_Attacker_End">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_Internet_Attacker_Annot" source="org.eclipse.papyrus">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_Internet_Attacker_Annot_Detail" key="nature" value="UML_Nature"/>
+      </eAnnotations>
+      <ownedEnd xmi:type="uml:Property" xmi:id="_Internet_Attacker_End" name="internet" type="_Internet_UAV_1" association="_Internet_Attacker_Assoc"/>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Association" xmi:id="_49JNYMevEfCGPb_9WwiKNw" memberEnd="_49KbgsevEfCGPb_9WwiKNw _49LCksevEfCGPb_9WwiKNw">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_49KbgMevEfCGPb_9WwiKNw" source="org.eclipse.papyrus">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_49KbgcevEfCGPb_9WwiKNw" key="nature" value="UML_Nature"/>
+      </eAnnotations>
+      <ownedEnd xmi:type="uml:Property" xmi:id="_49LCksevEfCGPb_9WwiKNw" name="groundcontrolstation" type="_TD9FkMetEfC1GIT_JHAH1w" association="_49JNYMevEfCGPb_9WwiKNw"/>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Association" xmi:id="_FxY78MewEfCGPb_9WwiKNw" memberEnd="_FxZjAsewEfCGPb_9WwiKNw _FxaxIMewEfCGPb_9WwiKNw">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_FxZjAMewEfCGPb_9WwiKNw" source="org.eclipse.papyrus">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_FxZjAcewEfCGPb_9WwiKNw" key="nature" value="UML_Nature"/>
+      </eAnnotations>
+      <ownedEnd xmi:type="uml:Property" xmi:id="_FxaxIMewEfCGPb_9WwiKNw" name="uav_platform" type="_S5N1MMetEfC1GIT_JHAH1w" association="_FxY78MewEfCGPb_9WwiKNw"/>
+    </packagedElement>
+    <packagedElement xmi:type="uml:InformationFlow" xmi:id="_j67iUMh0EfC7uu5CIMiXWQ" name="fc_to_comm" informationSource="_QcnIcMh0EfC7uu5CIMiXWQ" informationTarget="_RRHukMh0EfC7uu5CIMiXWQ">
+      <conveyed xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#Integer"/>
+    </packagedElement>
+    <packagedElement xmi:type="uml:InformationFlow" xmi:id="_SuaWgMh1EfC7uu5CIMiXWQ" name="externalflow" informationSource="_RRHukMh0EfC7uu5CIMiXWQ" informationTarget="_x2jIoMh0EfC7uu5CIMiXWQ">
+      <conveyed xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#Integer"/>
+    </packagedElement>
+    <packagedElement xmi:type="uml:InformationFlow" xmi:id="__IrbIMh2EfC7uu5CIMiXWQ" name="externalflow" informationSource="_ywhLoMh2EfC7uu5CIMiXWQ" informationTarget="_5jiXkMh2EfC7uu5CIMiXWQ">
+      <conveyed xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#Integer"/>
+    </packagedElement>
+    <packagedElement xmi:type="uml:InformationFlow" xmi:id="_GPS_to_FC_UAV" name="gps_to_fc" informationSource="_GPS_Prop_UAV" informationTarget="_QcnIcMh0EfC7uu5CIMiXWQ">
+      <conveyed xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#Integer"/>
+    </packagedElement>
+    <packagedElement xmi:type="uml:InformationFlow" xmi:id="_IMU_to_FC_UAV" name="imu_to_fc" informationSource="_IMU_Prop_UAV" informationTarget="_QcnIcMh0EfC7uu5CIMiXWQ">
+      <conveyed xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#Integer"/>
+    </packagedElement>
+    <packagedElement xmi:type="uml:InformationFlow" xmi:id="_FC_to_Motor_UAV" name="fc_to_motor" informationSource="_QcnIcMh0EfC7uu5CIMiXWQ" informationTarget="_Motor_Prop_UAV">
+      <conveyed xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#Integer"/>
+    </packagedElement>
+    <packagedElement xmi:type="uml:InformationFlow" xmi:id="_Internet_to_Comm_UAV" name="internet_to_comm" informationSource="_Internet_Attacker_End" informationTarget="_RRHukMh0EfC7uu5CIMiXWQ">
+      <conveyed xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#Integer"/>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Association" xmi:id="_4yHbMPXoEfCg7f67tgB0dA" memberEnd="_4yIpUPXoEfCg7f67tgB0dA _4yIpU_XoEfCg7f67tgB0dA">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_4yICQPXoEfCg7f67tgB0dA" source="org.eclipse.papyrus">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_4yICQfXoEfCg7f67tgB0dA" key="nature" value="UML_Nature"/>
+      </eAnnotations>
+      <ownedEnd xmi:type="uml:Property" xmi:id="_4yIpU_XoEfCg7f67tgB0dA" name="communicationmodule" type="_TWFXYMetEfC1GIT_JHAH1w" association="_4yHbMPXoEfCg7f67tgB0dA"/>
+    </packagedElement>
+    <profileApplication xmi:type="uml:ProfileApplication" xmi:id="_O2RkMMetEfC1GIT_JHAH1w">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_O2VOkMetEfC1GIT_JHAH1w" source="http://www.eclipse.org/uml2/2.0.0/UML">
+        <references xmi:type="ecore:EPackage" href="http://www.eclipse.org/papyrus/sysml/1.6/SysML#/"/>
+      </eAnnotations>
+      <appliedProfile xmi:type="uml:Profile" href="pathmap://SysML16_PROFILES/SysML.profile.uml#SysML"/>
+    </profileApplication>
+    <profileApplication xmi:type="uml:ProfileApplication" xmi:id="_O3MKMMetEfC1GIT_JHAH1w">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_O3NYUMetEfC1GIT_JHAH1w" source="http://www.eclipse.org/uml2/2.0.0/UML">
+        <references xmi:type="ecore:EPackage" href="http://www.eclipse.org/papyrus/sysml/1.6/SysML#//activities"/>
+      </eAnnotations>
+      <appliedProfile xmi:type="uml:Profile" href="pathmap://SysML16_PROFILES/SysML.profile.uml#SysML.package_packagedElement_Activities"/>
+    </profileApplication>
+    <profileApplication xmi:type="uml:ProfileApplication" xmi:id="_O3RpwMetEfC1GIT_JHAH1w">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_O3SQ0MetEfC1GIT_JHAH1w" source="http://www.eclipse.org/uml2/2.0.0/UML">
+        <references xmi:type="ecore:EPackage" href="http://www.eclipse.org/papyrus/sysml/1.6/SysML#//allocations"/>
+      </eAnnotations>
+      <appliedProfile xmi:type="uml:Profile" href="pathmap://SysML16_PROFILES/SysML.profile.uml#SysML.package_packagedElement_Allocations"/>
+    </profileApplication>
+    <profileApplication xmi:type="uml:ProfileApplication" xmi:id="_O3SQ0cetEfC1GIT_JHAH1w">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_O3S34MetEfC1GIT_JHAH1w" source="http://www.eclipse.org/uml2/2.0.0/UML">
+        <references xmi:type="ecore:EPackage" href="http://www.eclipse.org/papyrus/sysml/1.6/SysML#//blocks"/>
+      </eAnnotations>
+      <appliedProfile xmi:type="uml:Profile" href="pathmap://SysML16_PROFILES/SysML.profile.uml#SysML.package_packagedElement_Blocks"/>
+    </profileApplication>
+    <profileApplication xmi:type="uml:ProfileApplication" xmi:id="_O3S34cetEfC1GIT_JHAH1w">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_O3S34setEfC1GIT_JHAH1w" source="http://www.eclipse.org/uml2/2.0.0/UML">
+        <references xmi:type="ecore:EPackage" href="http://www.eclipse.org/papyrus/sysml/1.6/SysML#//constraintblocks"/>
+      </eAnnotations>
+      <appliedProfile xmi:type="uml:Profile" href="pathmap://SysML16_PROFILES/SysML.profile.uml#SysML.package_packagedElement_ConstraintBlocks"/>
+    </profileApplication>
+    <profileApplication xmi:type="uml:ProfileApplication" xmi:id="_O3S348etEfC1GIT_JHAH1w">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_O3S35MetEfC1GIT_JHAH1w" source="http://www.eclipse.org/uml2/2.0.0/UML">
+        <references xmi:type="ecore:EPackage" href="http://www.eclipse.org/papyrus/sysml/1.6/SysML#//deprecatedelements"/>
+      </eAnnotations>
+      <appliedProfile xmi:type="uml:Profile" href="pathmap://SysML16_PROFILES/SysML.profile.uml#SysML.package_packagedElement_DeprecatedElements"/>
+    </profileApplication>
+    <profileApplication xmi:type="uml:ProfileApplication" xmi:id="_O3Te8MetEfC1GIT_JHAH1w">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_O3Te8cetEfC1GIT_JHAH1w" source="http://www.eclipse.org/uml2/2.0.0/UML">
+        <references xmi:type="ecore:EPackage" href="http://www.eclipse.org/papyrus/sysml/1.6/SysML#//modelelements"/>
+      </eAnnotations>
+      <appliedProfile xmi:type="uml:Profile" href="pathmap://SysML16_PROFILES/SysML.profile.uml#SysML.package_packagedElement_ModelElements"/>
+    </profileApplication>
+    <profileApplication xmi:type="uml:ProfileApplication" xmi:id="_O3Te8setEfC1GIT_JHAH1w">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_O3Te88etEfC1GIT_JHAH1w" source="http://www.eclipse.org/uml2/2.0.0/UML">
+        <references xmi:type="ecore:EPackage" href="http://www.eclipse.org/papyrus/sysml/1.6/SysML#//portsandflows"/>
+      </eAnnotations>
+      <appliedProfile xmi:type="uml:Profile" href="pathmap://SysML16_PROFILES/SysML.profile.uml#SysML.package_packagedElement_Ports_u0026Flows"/>
+    </profileApplication>
+    <profileApplication xmi:type="uml:ProfileApplication" xmi:id="_O3Te9MetEfC1GIT_JHAH1w">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_O3Te9cetEfC1GIT_JHAH1w" source="http://www.eclipse.org/uml2/2.0.0/UML">
+        <references xmi:type="ecore:EPackage" href="http://www.eclipse.org/papyrus/sysml/1.6/SysML#//requirements"/>
+      </eAnnotations>
+      <appliedProfile xmi:type="uml:Profile" href="pathmap://SysML16_PROFILES/SysML.profile.uml#SysML.package_packagedElement_Requirements"/>
+    </profileApplication>
+    <profileApplication xmi:type="uml:ProfileApplication" xmi:id="_O3UGAMetEfC1GIT_JHAH1w">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_O3UGAcetEfC1GIT_JHAH1w" source="http://www.eclipse.org/uml2/2.0.0/UML">
+        <references xmi:type="ecore:EPackage" href="http://www.eclipse.org/uml2/5.0.0/UML/Profile/Standard#/"/>
+      </eAnnotations>
+      <appliedProfile xmi:type="uml:Profile" href="pathmap://UML_PROFILES/Standard.profile.uml#_0"/>
+    </profileApplication>
+    <profileApplication xmi:type="uml:ProfileApplication" xmi:id="_O45aYMetEfC1GIT_JHAH1w">
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_O46ogMetEfC1GIT_JHAH1w" source="PapyrusVersion">
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_O46ogcetEfC1GIT_JHAH1w" key="Version" value="0.1.30"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_O46ogsetEfC1GIT_JHAH1w" key="Comment" value=""/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_O46og8etEfC1GIT_JHAH1w" key="Copyright" value=""/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_O46ohMetEfC1GIT_JHAH1w" key="Date" value="2023-11-22"/>
+        <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_O46ohcetEfC1GIT_JHAH1w" key="Author" value=""/>
+      </eAnnotations>
+      <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_O46BcMetEfC1GIT_JHAH1w" source="http://www.eclipse.org/uml2/2.0.0/UML">
+        <references xmi:type="ecore:EPackage" href="file:/E:/OT/CERESHugo-main/CERESHugo-main/SysML_Extension_for_MulVAL/SysML_Extension_for_MulVAL.profile.uml#_6vnjwIlIEe6lssfuL0bjRg"/>
+      </eAnnotations>
+      <appliedProfile xmi:type="uml:Profile" href="file:/E:/OT/CERESHugo-main/CERESHugo-main/SysML_Extension_for_MulVAL/SysML_Extension_for_MulVAL.profile.uml#_vOlHkFfGEe6A-uQ1qxwh1w"/>
+    </profileApplication>
+  </uml:Model>
+  <Blocks:Block xmi:id="_S5SGoMetEfC1GIT_JHAH1w" base_Class="_S5N1MMetEfC1GIT_JHAH1w"/>
+  <Blocks:Block xmi:id="_TD-6wMetEfC1GIT_JHAH1w" base_Class="_TD9FkMetEfC1GIT_JHAH1w"/>
+  <Blocks:Block xmi:id="_TM9QkMetEfC1GIT_JHAH1w" base_Class="_TM7bYMetEfC1GIT_JHAH1w"/>
+  <Blocks:Block xmi:id="_TWHzoMetEfC1GIT_JHAH1w" base_Class="_TWFXYMetEfC1GIT_JHAH1w"/>
+  <Blocks:Block xmi:id="_Internet_Block_UAV" base_Class="_Internet_UAV_1"/>
+  <Blocks:Block xmi:id="_GPS_Block_UAV" base_Class="_GPS_Receiver_UAV"/>
+  <Blocks:Block xmi:id="_IMU_Block_UAV" base_Class="_IMU_Sensor_UAV"/>
+  <Blocks:Block xmi:id="_Motor_Block_UAV" base_Class="_MotorController_UAV"/>
+  <PortsAndFlows:ItemFlow xmi:id="_j7Bo8Mh0EfC7uu5CIMiXWQ" base_InformationFlow="_j67iUMh0EfC7uu5CIMiXWQ"/>
+  <PortsAndFlows:ProxyPort xmi:id="_x2naEMh0EfC7uu5CIMiXWQ" base_Port="_x2jIoMh0EfC7uu5CIMiXWQ"/>
+  <PortsAndFlows:ItemFlow xmi:id="_SucywMh1EfC7uu5CIMiXWQ" base_InformationFlow="_SuaWgMh1EfC7uu5CIMiXWQ"/>
+  <PortsAndFlows:FullPort xmi:id="_5jkz0Mh2EfC7uu5CIMiXWQ" base_Port="_5jiXkMh2EfC7uu5CIMiXWQ"/>
+  <PortsAndFlows:ItemFlow xmi:id="__IuecMh2EfC7uu5CIMiXWQ" base_InformationFlow="__IrbIMh2EfC7uu5CIMiXWQ"/>
+  <PortsAndFlows:ProxyPort xmi:id="_TKQ6IMh3EfC7uu5CIMiXWQ" base_Port="_TKPE8Mh3EfC7uu5CIMiXWQ"/>
+  <PortsAndFlows:FullPort xmi:id="_GPS_FullPort_UAV" base_Port="_GPS_Port_UAV"/>
+  <PortsAndFlows:FullPort xmi:id="_IMU_FullPort_UAV" base_Port="_IMU_Port_UAV"/>
+  <PortsAndFlows:FullPort xmi:id="_Motor_FullPort_UAV" base_Port="_Motor_Port_UAV"/>
+  <PortsAndFlows:ItemFlow xmi:id="_GPS_ItemFlow_UAV" base_InformationFlow="_GPS_to_FC_UAV"/>
+  <PortsAndFlows:ItemFlow xmi:id="_IMU_ItemFlow_UAV" base_InformationFlow="_IMU_to_FC_UAV"/>
+  <PortsAndFlows:ItemFlow xmi:id="_Motor_ItemFlow_UAV" base_InformationFlow="_FC_to_Motor_UAV"/>
+  <SysML_Extension_for_MulVAL.Stereotypes:Attacker xmi:id="_UAV_Attacker_1" base_Actor="_VDdfMMetEfC1GIT_JHAH1w"/>
+  <SysML_Extension_for_MulVAL.Stereotypes:Program xmi:id="_UAV_Program_FC" base_Class="_TM7bYMetEfC1GIT_JHAH1w" version="1.0">
+    <securityProperty>Availability</securityProperty>
+    <securityProperty>Integrity</securityProperty>
+  </SysML_Extension_for_MulVAL.Stereotypes:Program>
+  <SysML_Extension_for_MulVAL.Stereotypes:Program xmi:id="_UAV_Program_GCS" base_Class="_TD9FkMetEfC1GIT_JHAH1w" version="2.4">
+    <securityProperty>Availability</securityProperty>
+    <securityProperty>Confidentiality</securityProperty>
+  </SysML_Extension_for_MulVAL.Stereotypes:Program>
+  <SysML_Extension_for_MulVAL.Stereotypes:Program xmi:id="_UAV_Program_Comm" base_Class="_TWFXYMetEfC1GIT_JHAH1w" version="1.0">
+    <securityProperty>Availability</securityProperty>
+    <securityProperty>Integrity</securityProperty>
+  </SysML_Extension_for_MulVAL.Stereotypes:Program>
+  <SysML_Extension_for_MulVAL.Stereotypes:Host xmi:id="_UAV_Host_CommMod" base_Class="_TWFXYMetEfC1GIT_JHAH1w" importance="Medium" isAsset="true">
+    <securityProperty>Confidentiality</securityProperty>
+    <securityProperty>Availability</securityProperty>
+    <securityProperty>Integrity</securityProperty>
+  </SysML_Extension_for_MulVAL.Stereotypes:Host>
+  <SysML_Extension_for_MulVAL.Stereotypes:Host xmi:id="_UAV_Host_GCS" base_Class="_TD9FkMetEfC1GIT_JHAH1w" importance="High" isAsset="true">
+    <securityProperty>Availability</securityProperty>
+    <securityProperty>Confidentiality</securityProperty>
+    <securityProperty>Integrity</securityProperty>
+  </SysML_Extension_for_MulVAL.Stereotypes:Host>
+  <SysML_Extension_for_MulVAL.Stereotypes:Host xmi:id="_UAV_Host_Internet" base_Class="_Internet_UAV_1"/>
+  <SysML_Extension_for_MulVAL.Stereotypes:Host xmi:id="_UAV_Host_UAVPlatform" base_Class="_S5N1MMetEfC1GIT_JHAH1w" importance="High" isAsset="true">
+    <securityProperty>Availability</securityProperty>
+    <securityProperty>Integrity</securityProperty>
+  </SysML_Extension_for_MulVAL.Stereotypes:Host>
+  <SysML_Extension_for_MulVAL.Stereotypes:Connection xmi:id="_UAV_Conn_FC_Comm" base_InformationFlow="_j67iUMh0EfC7uu5CIMiXWQ" protocol="tcp"/>
+  <SysML_Extension_for_MulVAL.Stereotypes:Connection xmi:id="_UAV_Conn_Comm_Ext" base_InformationFlow="_SuaWgMh1EfC7uu5CIMiXWQ" protocol="tcp"/>
+  <SysML_Extension_for_MulVAL.Stereotypes:Connection xmi:id="_UAV_Conn_GCS_Ext" base_InformationFlow="__IrbIMh2EfC7uu5CIMiXWQ" protocol="tcp"/>
+  <SysML_Extension_for_MulVAL.Stereotypes:Connection xmi:id="_UAV_Conn_Internet_Comm" base_InformationFlow="_Internet_to_Comm_UAV" protocol="tcp"/>
+  <SysML_Extension_for_MulVAL.Stereotypes:Device xmi:id="_UAV_Device_GPS" base_Class="_GPS_Receiver_UAV" importance="High">
+    <securityProperty>Integrity</securityProperty>
+  </SysML_Extension_for_MulVAL.Stereotypes:Device>
+  <SysML_Extension_for_MulVAL.Stereotypes:Device xmi:id="_UAV_Device_IMU" base_Class="_IMU_Sensor_UAV" importance="Medium">
+    <securityProperty>Integrity</securityProperty>
+  </SysML_Extension_for_MulVAL.Stereotypes:Device>
+  <SysML_Extension_for_MulVAL.Stereotypes:Device xmi:id="_UAV_Device_Motor" base_Class="_MotorController_UAV" importance="High" type="Actuator">
+    <securityProperty>Availability</securityProperty>
+    <securityProperty>Integrity</securityProperty>
+  </SysML_Extension_for_MulVAL.Stereotypes:Device>
+  <SysML_Extension_for_MulVAL.Stereotypes:Connection xmi:id="_UAV_Conn_GPS_FC" base_InformationFlow="_GPS_to_FC_UAV" protocol="uart"/>
+  <SysML_Extension_for_MulVAL.Stereotypes:Connection xmi:id="_UAV_Conn_IMU_FC" base_InformationFlow="_IMU_to_FC_UAV" protocol="i2c"/>
+  <SysML_Extension_for_MulVAL.Stereotypes:Connection xmi:id="_UAV_Conn_FC_Motor" base_InformationFlow="_FC_to_Motor_UAV" protocol="pwm"/>
+</xmi:XMI>
