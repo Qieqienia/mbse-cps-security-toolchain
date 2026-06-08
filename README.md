@@ -36,14 +36,3 @@ This toolchain provides an end-to-end workflow:
 
 See [docs/SETUP.md](docs/SETUP.md) for detailed instructions.
 
-## 📝 Citation
-
-If you use this toolchain, please cite the associated paper:
-
-```bibtex
-@article{yourname2026mbse,
-  title={MBSE-Driven Predictive Security Analysis for Networked CPS: A Cryptographic Semantic Control Layer and Risk Assessment Approach},
-  author={Your Name and Others},
-  journal={...},
-  year={2026}
-}
